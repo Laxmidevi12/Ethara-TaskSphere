@@ -1,61 +1,34 @@
-const Task = require("../models/Task");
+// backend/controllers/taskController.js
 
-const User = require("../models/User");
+const Task = require("../models/Task");
 
 
 // CREATE TASK
-const createTask = async (req, res) => {
+const createTask = async (
+  req,
+  res
+) => {
 
   try {
 
     const {
-
-      title,
-
-      description,
-
       assignedTo,
-
       reviewer,
-
-      dueDate,
-
       projectId
-
     } = req.body;
 
+    const task =
+      await Task.create({
 
-    // ONLY PROJECT LEAD
-    if (
-      req.user.role !== "projectlead"
-    ) {
+        assignedTo,
+        reviewer,
+        projectId,
 
-      return res.status(403).json({
-        message:
-          "Only Project Lead can assign tasks"
+        status: "pending",
+
+        createdBy:
+          req.user.id
       });
-
-    }
-
-
-    const task = await Task.create({
-
-      title,
-
-      description,
-
-      assignedTo,
-
-      reviewer,
-
-      dueDate,
-
-      project: projectId,
-
-      assignedBy: req.user.id
-
-    });
-
 
     res.status(201).json(task);
 
@@ -71,85 +44,34 @@ const createTask = async (req, res) => {
 
 
 // GET TASKS
-const getTasks = async (req, res) => {
+const getTasks = async (
+  req,
+  res
+) => {
 
   try {
 
-    let tasks = [];
+    const tasks =
+      await Task.find({
 
-
-    // PROJECT LEAD
-    if (
-      req.user.role === "projectlead"
-    ) {
-
-      tasks = await Task.find()
-
-        .populate(
-          "assignedTo",
-          "name role"
-        )
-
-        .populate(
-          "reviewer",
-          "name"
-        )
-
-        .populate(
-          "project",
-          "title"
-        );
-
-    }
-
-
-    // TASKER
-    else if (
-      req.user.role === "tasker"
-    ) {
-
-      tasks = await Task.find({
-
-        assignedTo: req.user.id
+        projectId:
+          req.params.projectId
 
       })
 
-        .populate(
-          "project",
-          "title"
-        )
+      .populate(
+        "assignedTo",
+        "name email"
+      )
 
-        .populate(
-          "reviewer",
-          "name"
-        );
+      .populate(
+        "reviewer",
+        "name email"
+      )
 
-    }
-
-
-    // REVIEWER
-    else if (
-      req.user.role === "reviewer"
-    ) {
-
-      tasks = await Task.find({
-
-        reviewer: req.user.id
-
-      })
-
-        .populate(
-          "assignedTo",
-          "name"
-        )
-
-        .populate(
-          "project",
-          "title"
-        );
-
-    }
-
+      .sort({
+        createdAt: -1
+      });
 
     res.status(200).json(tasks);
 
@@ -164,44 +86,47 @@ const getTasks = async (req, res) => {
 };
 
 
-// UPDATE STATUS
-const updateTaskStatus =
-  async (req, res) => {
+// UPDATE TASK STATUS
+const updateTask = async (
+  req,
+  res
+) => {
 
-    try {
+  try {
 
-      const { status } = req.body;
+    const task =
+      await Task.findByIdAndUpdate(
 
-      const task =
-        await Task.findByIdAndUpdate(
+        req.params.taskId,
 
-          req.params.id,
+        {
+          status:
+            req.body.status
+        },
 
-          { status },
+        {
+          new: true
+        }
 
-          { new: true }
+      );
 
-        );
+    res.status(200).json(task);
 
-      res.status(200).json(task);
+  } catch (error) {
 
-    } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
 
-      res.status(500).json({
-        message: error.message
-      });
+  }
 
-    }
-
-  };
+};
 
 
 module.exports = {
 
   createTask,
-
   getTasks,
-
-  updateTaskStatus
+  updateTask
 
 };
