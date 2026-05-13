@@ -1,3 +1,5 @@
+// backend/routes/taskRoutes.js
+
 const express = require("express");
 
 const router = express.Router();
@@ -5,12 +7,16 @@ const router = express.Router();
 const {
   createTask,
   getTasks,
-  updateTaskStatus
-} = require("../controllers/taskController");
+  updateTask
+} = require(
+  "../controllers/taskController"
+);
 
 const {
   protect
-} = require("../middleware/authMiddleware");
+} = require(
+  "../middleware/authMiddleware"
+);
 
 
 // CREATE TASK
@@ -29,11 +35,11 @@ router.get(
 );
 
 
-// UPDATE TASK STATUS
+// UPDATE TASK
 router.put(
-  "/:id",
+  "/:taskId",
   protect,
-  updateTaskStatus
+  updateTask
 );
 
 module.exports = router;
