@@ -1,20 +1,33 @@
-import { useEffect, useState } from "react";
+// frontend/src/pages/Tasks.jsx
 
-import { useParams } from "react-router-dom";
+import {
+  useEffect,
+  useState
+} from "react";
 
-import { jwtDecode } from "jwt-decode";
+import {
+  useParams
+} from "react-router-dom";
 
 import API from "../api";
 
+import {
+  jwtDecode
+} from "jwt-decode";
+
 function Tasks() {
 
-  const { projectId } = useParams();
+  const { projectId } =
+    useParams();
 
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("token");
 
-  const decoded = jwtDecode(token);
+  const decoded =
+    jwtDecode(token);
 
-  const currentRole = decoded.role;
+  const currentRole =
+    decoded.role;
 
 
   const [tasks, setTasks] =
@@ -27,57 +40,27 @@ function Tasks() {
   const [formData, setFormData] =
     useState({
 
-      title: "",
-
-      description: "",
-
       assignedTo: "",
-
-      reviewer: "",
-
-      dueDate: ""
+      reviewer: ""
 
     });
 
 
-  // FETCH TASKS
-  const fetchTasks = async () => {
-
-    try {
-
-      const res = await API.get(
-        "/tasks",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      setTasks(res.data);
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  };
-
-
-  // FETCH TEAM MEMBERS
+  // FETCH USERS
   const fetchUsers = async () => {
 
     try {
 
-      const res = await API.get(
-        "/auth/users",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
+      const res =
+        await API.get(
+          "/auth/users",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
           }
-        }
-      );
+        );
 
       setUsers(res.data);
 
@@ -90,19 +73,54 @@ function Tasks() {
   };
 
 
-  // INPUT
+  // FETCH TASKS
+  const fetchTasks = async () => {
+
+    try {
+
+      const res =
+        await API.get(
+
+          `/tasks/${projectId}`,
+
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
+      setTasks(res.data);
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+
+  // HANDLE INPUT
   const handleChange = (e) => {
 
     setFormData({
+
       ...formData,
-      [e.target.name]: e.target.value
+
+      [e.target.name]:
+        e.target.value
+
     });
 
   };
 
 
   // CREATE TASK
-  const createTask = async (e) => {
+  const createTask = async (
+    e
+  ) => {
 
     e.preventDefault();
 
@@ -122,7 +140,54 @@ function Tasks() {
 
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+
+      );
+
+      alert(
+        "Task Assigned"
+      );
+
+      fetchTasks();
+
+    } catch (error) {
+
+      console.log(
+        error.response?.data
+      );
+
+      alert(
+        error.response?.data?.message
+      );
+
+    }
+
+  };
+
+
+  // UPDATE STATUS
+  const updateStatus = async (
+
+    taskId,
+    status
+
+  ) => {
+
+    try {
+
+      await API.put(
+
+        `/tasks/${taskId}`,
+
+        { status },
+
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
           }
         }
 
@@ -139,37 +204,6 @@ function Tasks() {
   };
 
 
-  // STATUS UPDATE
-  const updateStatus =
-    async (taskId, status) => {
-
-      try {
-
-        await API.put(
-
-          `/tasks/${taskId}`,
-
-          { status },
-
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-
-        );
-
-        fetchTasks();
-
-      } catch (error) {
-
-        console.log(error);
-
-      }
-
-    };
-
-
   useEffect(() => {
 
     fetchTasks();
@@ -183,23 +217,31 @@ function Tasks() {
 
     <div
       style={{
-        padding: "40px",
+        background:
+          "#020617",
 
-        background: "#020617",
+        minHeight:
+          "100vh",
 
-        minHeight: "100vh",
+        color:
+          "white",
 
-        color: "white"
+        padding:
+          "40px",
+
+        fontFamily:
+          "Arial"
       }}
     >
 
       <h1
         style={{
-          marginBottom: "30px"
+          marginBottom:
+            "30px"
         }}
       >
 
-        Project Workspace
+        Enterprise Workflow Board
 
       </h1>
 
@@ -209,23 +251,26 @@ function Tasks() {
         currentRole ===
         "projectlead" && (
 
-          <form
-            onSubmit={createTask}
-
+          <div
             style={{
-              background: "#111827",
+              background:
+                "#1e293b",
 
-              padding: "30px",
+              padding:
+                "25px",
 
-              borderRadius: "20px",
+              borderRadius:
+                "16px",
 
-              marginBottom: "35px"
+              marginBottom:
+                "30px"
             }}
           >
 
             <h2
               style={{
-                marginBottom: "20px"
+                marginBottom:
+                  "20px"
               }}
             >
 
@@ -234,61 +279,68 @@ function Tasks() {
             </h2>
 
 
-            <input
-              type="text"
-
-              name="title"
-
-              placeholder="Task Title"
-
-              onChange={handleChange}
-
-              style={inputStyle}
-            />
-
-
-            <input
-              type="text"
-
-              name="description"
-
-              placeholder="Description"
-
-              onChange={handleChange}
-
-              style={inputStyle}
-            />
-
-
-            {/* TASKER */}
-            <select
-              name="assignedTo"
-
-              onChange={handleChange}
-
-              style={inputStyle}
+            <form
+              onSubmit={
+                createTask
+              }
             >
 
-              <option>
+              {/* TASKER */}
+              <select
+                name="assignedTo"
 
-                Select Tasker
+                onChange={
+                  handleChange
+                }
 
-              </option>
+                required
 
-              {
-                users
+                style={{
+                  width:
+                    "100%",
+
+                  padding:
+                    "14px",
+
+                  borderRadius:
+                    "10px",
+
+                  marginBottom:
+                    "15px",
+
+                  background:
+                    "#334155",
+
+                  color:
+                    "white"
+                }}
+              >
+
+                <option value="">
+                  Select Tasker
+                </option>
+
+                {
+                  users
 
                   .filter(
-                    (u) =>
-                      u.role === "tasker"
+
+                    (user) =>
+                      user.role ===
+                      "tasker"
+
                   )
 
                   .map((user) => (
 
                     <option
-                      key={user._id}
+                      key={
+                        user._id
+                      }
 
-                      value={user._id}
+                      value={
+                        user._id
+                      }
                     >
 
                       {user.name}
@@ -296,41 +348,67 @@ function Tasks() {
                     </option>
 
                   ))
-              }
+                }
 
-            </select>
+              </select>
 
 
-            {/* REVIEWER */}
-            <select
-              name="reviewer"
+              {/* REVIEWER */}
+              <select
+                name="reviewer"
 
-              onChange={handleChange}
+                onChange={
+                  handleChange
+                }
 
-              style={inputStyle}
-            >
+                required
 
-              <option>
+                style={{
+                  width:
+                    "100%",
 
-                Select Reviewer
+                  padding:
+                    "14px",
 
-              </option>
+                  borderRadius:
+                    "10px",
 
-              {
-                users
+                  marginBottom:
+                    "15px",
+
+                  background:
+                    "#334155",
+
+                  color:
+                    "white"
+                }}
+              >
+
+                <option value="">
+                  Select Reviewer
+                </option>
+
+                {
+                  users
 
                   .filter(
-                    (u) =>
-                      u.role ===
+
+                    (user) =>
+                      user.role ===
                       "reviewer"
+
                   )
 
                   .map((user) => (
 
                     <option
-                      key={user._id}
+                      key={
+                        user._id
+                      }
 
-                      value={user._id}
+                      value={
+                        user._id
+                      }
                     >
 
                       {user.name}
@@ -338,45 +416,47 @@ function Tasks() {
                     </option>
 
                   ))
-              }
+                }
 
-            </select>
-
-
-            <input
-              type="date"
-
-              name="dueDate"
-
-              onChange={handleChange}
-
-              style={inputStyle}
-            />
+              </select>
 
 
-            <button style={btnStyle}>
+              <button
+                style={{
+                  padding:
+                    "14px 25px",
 
-              Assign Task
+                  background:
+                    "#3b82f6",
 
-            </button>
+                  color:
+                    "white",
 
-          </form>
+                  border:
+                    "none",
+
+                  borderRadius:
+                    "10px",
+
+                  cursor:
+                    "pointer"
+                }}
+              >
+
+                Assign Task
+
+              </button>
+
+            </form>
+
+          </div>
 
         )
       }
 
 
-      {/* TASKS */}
-      <div
-        style={{
-          display: "grid",
-
-          gridTemplateColumns:
-            "repeat(auto-fit,minmax(320px,1fr))",
-
-          gap: "20px"
-        }}
-      >
+      {/* TASK LIST */}
+      <div>
 
         {
           tasks.map((task) => (
@@ -385,108 +465,254 @@ function Tasks() {
               key={task._id}
 
               style={{
-                background: "#111827",
+                background:
+                  "#1e293b",
 
-                padding: "25px",
+                padding:
+                  "20px",
 
-                borderRadius: "20px"
+                borderRadius:
+                  "16px",
+
+                marginBottom:
+                  "20px",
+
+                border:
+                  "1px solid #334155"
               }}
             >
 
-              <h2>{task.title}</h2>
-
-              <p>{task.description}</p>
-
               <p>
-                <strong>Project:</strong>
+
+                <strong>
+                  Tasker:
+                </strong>
+
                 {" "}
+
                 {
-                  task.project?.title
+                  task
+                  .assignedTo
+                  ?.name
                 }
+
               </p>
+
 
               <p>
-                <strong>Status:</strong>
+
+                <strong>
+                  Reviewer:
+                </strong>
+
                 {" "}
-                {task.status}
+
+                {
+                  task
+                  .reviewer
+                  ?.name
+                }
+
               </p>
 
 
+              <p>
+
+                <strong>
+                  Status:
+                </strong>
+
+                {" "}
+
+                <span
+                  style={{
+                    color:
+
+                      task.status ===
+                      "completed"
+
+                        ? "#22c55e"
+
+                        : task.status ===
+                          "review"
+
+                        ? "#eab308"
+
+                        : task.status ===
+                          "ongoing"
+
+                        ? "#3b82f6"
+
+                        : "#ef4444"
+                  }}
+                >
+
+                  {task.status}
+
+                </span>
+
+              </p>
+
+
+              {/* TASKER */}
               {
                 currentRole ===
                 "tasker" && (
 
-                  <>
+                  <div
+                    style={{
+                      marginTop:
+                        "15px"
+                    }}
+                  >
+
                     <button
                       onClick={() =>
                         updateStatus(
                           task._id,
-                          "In Progress"
+                          "ongoing"
                         )
                       }
 
-                      style={btnStyle}
+                      style={{
+                        marginRight:
+                          "10px",
+
+                        padding:
+                          "10px",
+
+                        background:
+                          "#2563eb",
+
+                        color:
+                          "white",
+
+                        border:
+                          "none",
+
+                        borderRadius:
+                          "8px"
+                      }}
                     >
 
                       Start
 
                     </button>
 
+
                     <button
                       onClick={() =>
                         updateStatus(
                           task._id,
-                          "Under Review"
+                          "review"
                         )
                       }
 
-                      style={btnStyle}
+                      style={{
+                        padding:
+                          "10px",
+
+                        background:
+                          "#eab308",
+
+                        color:
+                          "black",
+
+                        border:
+                          "none",
+
+                        borderRadius:
+                          "8px"
+                      }}
                     >
 
-                      Submit
+                      Send For Review
 
                     </button>
-                  </>
+
+                  </div>
 
                 )
               }
 
 
+              {/* REVIEWER */}
               {
                 currentRole ===
                 "reviewer" && (
 
-                  <>
+                  <div
+                    style={{
+                      marginTop:
+                        "15px"
+                    }}
+                  >
+
                     <button
                       onClick={() =>
                         updateStatus(
                           task._id,
-                          "Completed"
+                          "completed"
                         )
                       }
 
-                      style={btnStyle}
+                      style={{
+                        marginRight:
+                          "10px",
+
+                        padding:
+                          "10px",
+
+                        background:
+                          "#22c55e",
+
+                        color:
+                          "white",
+
+                        border:
+                          "none",
+
+                        borderRadius:
+                          "8px"
+                      }}
                     >
 
                       Approve
 
                     </button>
 
+
                     <button
                       onClick={() =>
                         updateStatus(
                           task._id,
-                          "Rejected"
+                          "ongoing"
                         )
                       }
 
-                      style={btnStyle}
+                      style={{
+                        padding:
+                          "10px",
+
+                        background:
+                          "#ef4444",
+
+                        color:
+                          "white",
+
+                        border:
+                          "none",
+
+                        borderRadius:
+                          "8px"
+                      }}
                     >
 
                       Reject
 
                     </button>
-                  </>
+
+                  </div>
 
                 )
               }
@@ -501,43 +727,5 @@ function Tasks() {
     </div>
   );
 }
-
-
-const inputStyle = {
-
-  width: "100%",
-
-  padding: "14px",
-
-  marginBottom: "15px",
-
-  borderRadius: "12px",
-
-  border: "none",
-
-  background: "#1e293b",
-
-  color: "white"
-};
-
-const btnStyle = {
-
-  padding: "12px 20px",
-
-  border: "none",
-
-  borderRadius: "12px",
-
-  background:
-    "linear-gradient(to right,#06b6d4,#2563eb)",
-
-  color: "white",
-
-  cursor: "pointer",
-
-  marginRight: "10px",
-
-  marginTop: "10px"
-};
 
 export default Tasks;
