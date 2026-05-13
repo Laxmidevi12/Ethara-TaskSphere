@@ -1,6 +1,7 @@
 // backend/controllers/taskController.js
 
-const Task = require("../models/Task");
+const Task =
+  require("../models/Task");
 
 
 // CREATE TASK
@@ -10,8 +11,6 @@ const createTask = async (
 ) => {
 
   try {
-
-    console.log(req.body);
 
     const {
       assignedTo,
@@ -66,7 +65,6 @@ const createTask = async (
 };
 
 
-
 // GET TASKS
 const getTasks = async (
   req,
@@ -75,8 +73,7 @@ const getTasks = async (
 
   try {
 
-    let tasks = [];
-
+    let query = {};
 
     // PROJECT LEAD
     if (
@@ -84,16 +81,12 @@ const getTasks = async (
       "projectlead"
     ) {
 
-      tasks =
-        await Task.find({
-
-          projectId:
-            req.params.projectId
-
-        });
+      query = {
+        projectId:
+          req.params.projectId
+      };
 
     }
-
 
     // TASKER
     else if (
@@ -101,16 +94,12 @@ const getTasks = async (
       "tasker"
     ) {
 
-      tasks =
-        await Task.find({
-
-          assignedTo:
-            req.user.id
-
-        });
+      query = {
+        assignedTo:
+          req.user.id
+      };
 
     }
-
 
     // REVIEWER
     else if (
@@ -118,40 +107,29 @@ const getTasks = async (
       "reviewer"
     ) {
 
-      tasks =
-        await Task.find({
-
-          reviewer:
-            req.user.id
-
-        });
+      query = {
+        reviewer:
+          req.user.id
+      };
 
     }
 
+    const tasks =
+      await Task.find(query)
 
-    // POPULATE
-    tasks =
-      await Task.populate(
-        tasks,
-        [
-          {
-            path:
-              "assignedTo",
+      .populate(
+        "assignedTo",
+        "name email role"
+      )
 
-            select:
-              "name email role"
-          },
+      .populate(
+        "reviewer",
+        "name email role"
+      )
 
-          {
-            path:
-              "reviewer",
-
-            select:
-              "name email role"
-          }
-        ]
-      );
-
+      .sort({
+        createdAt: -1
+      });
 
     res.status(200).json(
       tasks
@@ -171,8 +149,7 @@ const getTasks = async (
 };
 
 
-
-// UPDATE TASK STATUS
+// UPDATE TASK
 const updateTask = async (
   req,
   res
@@ -205,7 +182,6 @@ const updateTask = async (
         "reviewer",
         "name email role"
       );
-
 
     res.status(200).json(
       task
