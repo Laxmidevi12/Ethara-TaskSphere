@@ -81,7 +81,7 @@ function Tasks() {
       const res =
         await API.get(
 
-          `/tasks/${projectId}`,
+          `/tasks/${projectId || "all"}`,
 
           {
             headers: {
@@ -90,6 +90,8 @@ function Tasks() {
             }
           }
         );
+
+      console.log(res.data);
 
       setTasks(res.data);
 
@@ -148,10 +150,17 @@ function Tasks() {
       );
 
       alert(
-        "Task Assigned"
+        "Task Assigned Successfully"
       );
 
-      fetchTasks();
+      await fetchTasks();
+
+      setFormData({
+
+        assignedTo: "",
+        reviewer: ""
+
+      });
 
     } catch (error) {
 
@@ -206,11 +215,15 @@ function Tasks() {
 
   useEffect(() => {
 
-    fetchTasks();
+    if (token) {
 
-    fetchUsers();
+      fetchTasks();
 
-  }, []);
+      fetchUsers();
+
+    }
+
+  }, [projectId]);
 
 
   return (
@@ -289,6 +302,10 @@ function Tasks() {
               <select
                 name="assignedTo"
 
+                value={
+                  formData.assignedTo
+                }
+
                 onChange={
                   handleChange
                 }
@@ -357,6 +374,10 @@ function Tasks() {
               <select
                 name="reviewer"
 
+                value={
+                  formData.reviewer
+                }
+
                 onChange={
                   handleChange
                 }
@@ -422,6 +443,8 @@ function Tasks() {
 
 
               <button
+                type="submit"
+
                 style={{
                   padding:
                     "14px 25px",
@@ -457,6 +480,16 @@ function Tasks() {
 
       {/* TASK LIST */}
       <div>
+
+        {
+          tasks.length === 0 && (
+
+            <h2>
+              No Tasks Available
+            </h2>
+
+          )
+        }
 
         {
           tasks.map((task) => (
@@ -581,7 +614,7 @@ function Tasks() {
                         padding:
                           "10px",
 
-                        background:
+                          background:
                           "#2563eb",
 
                         color:
