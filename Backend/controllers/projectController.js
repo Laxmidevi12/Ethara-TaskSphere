@@ -1,74 +1,158 @@
-const Project = require("../models/Project");
+const Project =
+  require("../models/Project");
 
-const User = require("../models/User");
+const Task =
+  require("../models/Task");
 
 
 // CREATE PROJECT
-const createProject = async (req, res) => {
+const createProject =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const { title, description } = req.body;
+      const {
+        title,
+        description
+      } = req.body;
 
-    const project = await Project.create({
+      const project =
+        await Project.create({
 
-      title,
-      description,
+          title,
+          description,
 
-      admin: req.user.id,
+          createdBy:
+            req.user.id
 
-      members: [req.user.id]
+        });
 
-    });
+      res.status(201).json(
+        project
+      );
 
+    } catch (error) {
 
-    // MAKE USER ADMIN
-    await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        role: "admin"
-      }
-    );
+      res.status(500).json({
+        message:
+          error.message
+      });
 
+    }
 
-    res.status(201).json({
-      message: "Project created successfully",
-      project
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: error.message
-    });
-
-  }
 };
 
 
-// GET USER PROJECTS
-const getProjects = async (req, res) => {
+// GET PROJECTS
+const getProjects =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const projects = await Project.find({
-      members: req.user.id
-    })
-    .populate("members", "name email")
-    .populate("admin", "name email");
+      let projects = [];
 
-    res.status(200).json(projects);
+      // PROJECT LEAD
+      if (
+        req.user.role ===
+        "projectlead"
+      ) {
 
-  } catch (error) {
+        projects =
+          await Project.find({
 
-    res.status(500).json({
-      message: error.message
-    });
+            createdBy:
+              req.user.id
 
-  }
+          });
+
+      }
+
+
+      // TASKER
+      else if (
+        req.user.role ===
+        "tasker"
+      ) {
+
+        const tasks =
+          await Task.find({
+
+            assignedTo:
+              req.user.id
+
+          });
+
+        const projectIds =
+          tasks.map(
+            (task) =>
+              task.projectId
+          );
+
+        projects =
+          await Project.find({
+
+            _id: {
+              $in:
+                projectIds
+            }
+
+          });
+
+      }
+
+
+      // REVIEWER
+      else if (
+        req.user.role ===
+        "reviewer"
+      ) {
+
+        const tasks =
+          await Task.find({
+
+            reviewer:
+              req.user.id
+
+          });
+
+        const projectIds =
+          tasks.map(
+            (task) =>
+              task.projectId
+          );
+
+        projects =
+          await Project.find({
+
+            _id: {
+              $in:
+                projectIds
+            }
+
+          });
+
+      }
+
+      res.status(200).json(
+        projects
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        message:
+          error.message
+      });
+
+    }
+
 };
 
 module.exports = {
+
   createProject,
   getProjects
+
 };
