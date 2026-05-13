@@ -11,6 +11,8 @@ const createTask = async (
 
   try {
 
+    console.log(req.body);
+
     const {
       assignedTo,
       reviewer,
@@ -28,14 +30,35 @@ const createTask = async (
 
         createdBy:
           req.user.id
+
       });
 
-    res.status(201).json(task);
+    const populatedTask =
+      await Task.findById(
+        task._id
+      )
+
+      .populate(
+        "assignedTo",
+        "name email role"
+      )
+
+      .populate(
+        "reviewer",
+        "name email role"
+      );
+
+    res.status(201).json(
+      populatedTask
+    );
 
   } catch (error) {
 
+    console.log(error);
+
     res.status(500).json({
-      message: error.message
+      message:
+        error.message
     });
 
   }
@@ -43,7 +66,7 @@ const createTask = async (
 };
 
 
-// GET TASKS
+
 // GET TASKS
 const getTasks = async (
   req,
@@ -54,32 +77,20 @@ const getTasks = async (
 
     let tasks = [];
 
+
     // PROJECT LEAD
     if (
       req.user.role ===
       "projectlead"
     ) {
 
-      tasks = await Task.find({
+      tasks =
+        await Task.find({
 
-        projectId:
-          req.params.projectId
+          projectId:
+            req.params.projectId
 
-      })
-
-      .populate(
-        "assignedTo",
-        "name email"
-      )
-
-      .populate(
-        "reviewer",
-        "name email"
-      )
-
-      .sort({
-        createdAt: -1
-      });
+        });
 
     }
 
@@ -90,26 +101,13 @@ const getTasks = async (
       "tasker"
     ) {
 
-      tasks = await Task.find({
+      tasks =
+        await Task.find({
 
-        assignedTo:
-          req.user.id
+          assignedTo:
+            req.user.id
 
-      })
-
-      .populate(
-        "assignedTo",
-        "name email"
-      )
-
-      .populate(
-        "reviewer",
-        "name email"
-      )
-
-      .sort({
-        createdAt: -1
-      });
+        });
 
     }
 
@@ -120,40 +118,58 @@ const getTasks = async (
       "reviewer"
     ) {
 
-      tasks = await Task.find({
+      tasks =
+        await Task.find({
 
-        reviewer:
-          req.user.id
+          reviewer:
+            req.user.id
 
-      })
-
-      .populate(
-        "assignedTo",
-        "name email"
-      )
-
-      .populate(
-        "reviewer",
-        "name email"
-      )
-
-      .sort({
-        createdAt: -1
-      });
+        });
 
     }
 
-    res.status(200).json(tasks);
+
+    // POPULATE
+    tasks =
+      await Task.populate(
+        tasks,
+        [
+          {
+            path:
+              "assignedTo",
+
+            select:
+              "name email role"
+          },
+
+          {
+            path:
+              "reviewer",
+
+            select:
+              "name email role"
+          }
+        ]
+      );
+
+
+    res.status(200).json(
+      tasks
+    );
 
   } catch (error) {
 
+    console.log(error);
+
     res.status(500).json({
-      message: error.message
+      message:
+        error.message
     });
 
   }
 
 };
+
 
 
 // UPDATE TASK STATUS
@@ -178,14 +194,30 @@ const updateTask = async (
           new: true
         }
 
+      )
+
+      .populate(
+        "assignedTo",
+        "name email role"
+      )
+
+      .populate(
+        "reviewer",
+        "name email role"
       );
 
-    res.status(200).json(task);
+
+    res.status(200).json(
+      task
+    );
 
   } catch (error) {
 
+    console.log(error);
+
     res.status(500).json({
-      message: error.message
+      message:
+        error.message
     });
 
   }
