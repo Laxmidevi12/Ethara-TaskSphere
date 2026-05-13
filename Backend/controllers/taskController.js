@@ -44,6 +44,7 @@ const createTask = async (
 
 
 // GET TASKS
+// GET TASKS
 const getTasks = async (
   req,
   res
@@ -51,8 +52,15 @@ const getTasks = async (
 
   try {
 
-    const tasks =
-      await Task.find({
+    let tasks = [];
+
+    // PROJECT LEAD
+    if (
+      req.user.role ===
+      "projectlead"
+    ) {
+
+      tasks = await Task.find({
 
         projectId:
           req.params.projectId
@@ -72,6 +80,68 @@ const getTasks = async (
       .sort({
         createdAt: -1
       });
+
+    }
+
+
+    // TASKER
+    else if (
+      req.user.role ===
+      "tasker"
+    ) {
+
+      tasks = await Task.find({
+
+        assignedTo:
+          req.user.id
+
+      })
+
+      .populate(
+        "assignedTo",
+        "name email"
+      )
+
+      .populate(
+        "reviewer",
+        "name email"
+      )
+
+      .sort({
+        createdAt: -1
+      });
+
+    }
+
+
+    // REVIEWER
+    else if (
+      req.user.role ===
+      "reviewer"
+    ) {
+
+      tasks = await Task.find({
+
+        reviewer:
+          req.user.id
+
+      })
+
+      .populate(
+        "assignedTo",
+        "name email"
+      )
+
+      .populate(
+        "reviewer",
+        "name email"
+      )
+
+      .sort({
+        createdAt: -1
+      });
+
+    }
 
     res.status(200).json(tasks);
 
