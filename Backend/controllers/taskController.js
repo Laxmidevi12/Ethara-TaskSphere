@@ -8,24 +8,34 @@ const createTask = async (req, res) => {
 
   try {
 
+    const {
+
+      title,
+
+      description,
+
+      assignedTo,
+
+      reviewer,
+
+      dueDate,
+
+      projectId
+
+    } = req.body;
+
+
     // ONLY PROJECT LEAD
-    if (req.user.role !== "projectlead") {
+    if (
+      req.user.role !== "projectlead"
+    ) {
 
       return res.status(403).json({
         message:
-          "Only Project Leads can create tasks"
+          "Only Project Lead can assign tasks"
       });
 
     }
-
-    const {
-      title,
-      description,
-      priority,
-      projectId,
-      assignedTo,
-      reviewer
-    } = req.body;
 
 
     const task = await Task.create({
@@ -34,15 +44,15 @@ const createTask = async (req, res) => {
 
       description,
 
-      priority,
-
-      project: projectId,
-
       assignedTo,
 
       reviewer,
 
-      createdBy: req.user.id
+      dueDate,
+
+      project: projectId,
+
+      assignedBy: req.user.id
 
     });
 
@@ -60,83 +70,86 @@ const createTask = async (req, res) => {
 };
 
 
-
-// GET TASKS BASED ON ROLE
+// GET TASKS
 const getTasks = async (req, res) => {
 
   try {
-
-    const { projectId } = req.params;
 
     let tasks = [];
 
 
     // PROJECT LEAD
-    if (req.user.role === "projectlead") {
+    if (
+      req.user.role === "projectlead"
+    ) {
 
-      tasks = await Task.find({
-        project: projectId
-      })
+      tasks = await Task.find()
 
-      .populate(
-        "assignedTo",
-        "name email role"
-      )
+        .populate(
+          "assignedTo",
+          "name role"
+        )
 
-      .populate(
-        "reviewer",
-        "name email role"
-      );
+        .populate(
+          "reviewer",
+          "name"
+        )
+
+        .populate(
+          "project",
+          "title"
+        );
 
     }
 
 
     // TASKER
-    else if (req.user.role === "tasker") {
+    else if (
+      req.user.role === "tasker"
+    ) {
 
       tasks = await Task.find({
-
-        project: projectId,
 
         assignedTo: req.user.id
 
       })
 
-      .populate(
-        "assignedTo",
-        "name email role"
-      )
+        .populate(
+          "project",
+          "title"
+        )
 
-      .populate(
-        "reviewer",
-        "name email role"
-      );
+        .populate(
+          "reviewer",
+          "name"
+        );
 
     }
 
 
     // REVIEWER
-    else if (req.user.role === "reviewer") {
+    else if (
+      req.user.role === "reviewer"
+    ) {
 
       tasks = await Task.find({
-
-        project: projectId,
 
         reviewer: req.user.id
 
       })
 
-      .populate(
-        "assignedTo",
-        "name email role"
-      )
+        .populate(
+          "assignedTo",
+          "name"
+        )
 
-      .populate(
-        "reviewer",
-        "name email role"
-      );
+        .populate(
+          "project",
+          "title"
+        );
 
     }
+
 
     res.status(200).json(tasks);
 
@@ -151,71 +164,37 @@ const getTasks = async (req, res) => {
 };
 
 
+// UPDATE STATUS
+const updateTaskStatus =
+  async (req, res) => {
 
-// TASKER STATUS UPDATE
-const updateTaskStatus = async (req, res) => {
+    try {
 
-  try {
+      const { status } = req.body;
 
-    const task = await Task.findById(
-      req.params.id
-    );
+      const task =
+        await Task.findByIdAndUpdate(
 
+          req.params.id,
 
-    if (!task) {
+          { status },
 
-      return res.status(404).json({
-        message: "Task not found"
+          { new: true }
+
+        );
+
+      res.status(200).json(task);
+
+    } catch (error) {
+
+      res.status(500).json({
+        message: error.message
       });
 
     }
 
+  };
 
-    // TASKER CAN UPDATE OWN TASK ONLY
-    if (
-      req.user.role === "tasker" &&
-      task.assignedTo.toString() !==
-      req.user.id
-    ) {
-
-      return res.status(403).json({
-        message:
-          "You can only update your own tasks"
-      });
-
-    }
-
-
-    // REVIEWER CAN UPDATE REVIEW TASKS
-    if (
-      req.user.role === "reviewer" &&
-      task.reviewer.toString() !==
-      req.user.id
-    ) {
-
-      return res.status(403).json({
-        message:
-          "You can only review assigned tasks"
-      });
-
-    }
-
-
-    task.status = req.body.status;
-
-    await task.save();
-
-    res.status(200).json(task);
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: error.message
-    });
-
-  }
-
-};
 
 module.exports = {
 
