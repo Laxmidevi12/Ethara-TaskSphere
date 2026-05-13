@@ -29,14 +29,17 @@ const signup = async (req, res) => {
     } = req.body;
 
 
-    // CHECK EXISTING USER
+    // CHECK USER
     const userExists =
       await User.findOne({ email });
 
     if (userExists) {
 
       return res.status(400).json({
-        message: "User already exists"
+
+        message:
+          "User already exists"
+
       });
 
     }
@@ -50,10 +53,13 @@ const signup = async (req, res) => {
     let projectLeadId = null;
 
 
-    // FOR TASKER / REVIEWER
+    // TASKER / REVIEWER
     if (
+
       role === "tasker" ||
+
       role === "reviewer"
+
     ) {
 
       const lead =
@@ -65,15 +71,20 @@ const signup = async (req, res) => {
 
         });
 
+
       if (!lead) {
 
         return res.status(404).json({
+
           message:
             "Project Lead not found"
+
         });
 
       }
 
+
+      // SAVE LEAD ID
       projectLeadId = lead._id;
 
     }
@@ -100,15 +111,20 @@ const signup = async (req, res) => {
 
 
     res.status(201).json({
+
       message:
         "Registration Successful",
+
       user
+
     });
 
   } catch (error) {
 
     res.status(500).json({
+
       message: error.message
+
     });
 
   }
@@ -132,42 +148,55 @@ const login = async (req, res) => {
     if (!user) {
 
       return res.status(404).json({
-        message: "User not found"
+
+        message:
+          "User not found"
+
       });
 
     }
 
 
-    // CHECK PASSWORD
+    // PASSWORD CHECK
     const isMatch =
       await bcrypt.compare(
+
         password,
+
         user.password
+
       );
+
 
     if (!isMatch) {
 
       return res.status(400).json({
+
         message:
           "Invalid credentials"
+
       });
 
     }
 
 
-    // JWT TOKEN
+    // TOKEN
     const token = jwt.sign(
 
       {
+
         id: user._id,
 
         role: user.role
+
       },
 
       process.env.JWT_SECRET,
 
       {
+
         expiresIn: "7d"
+
       }
 
     );
@@ -183,9 +212,9 @@ const login = async (req, res) => {
 
         name: user.name,
 
-        email: user.email,
+        role: user.role,
 
-        role: user.role
+        email: user.email
 
       }
 
@@ -194,7 +223,9 @@ const login = async (req, res) => {
   } catch (error) {
 
     res.status(500).json({
+
       message: error.message
+
     });
 
   }
@@ -202,7 +233,7 @@ const login = async (req, res) => {
 };
 
 
-// GET TEAM USERS
+// GET USERS
 const getUsers = async (req, res) => {
 
   try {
@@ -212,7 +243,10 @@ const getUsers = async (req, res) => {
 
     // PROJECT LEAD
     if (
-      req.user.role === "projectlead"
+
+      req.user.role ===
+      "projectlead"
+
     ) {
 
       users = await User.find({
@@ -234,6 +268,7 @@ const getUsers = async (req, res) => {
           req.user.id
         );
 
+
       users = await User.find({
 
         projectLead:
@@ -251,12 +286,15 @@ const getUsers = async (req, res) => {
   } catch (error) {
 
     res.status(500).json({
+
       message: error.message
+
     });
 
   }
 
 };
+
 
 module.exports = {
 
