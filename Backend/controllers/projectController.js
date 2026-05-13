@@ -33,6 +33,8 @@ const createProject =
 
     } catch (error) {
 
+      console.log(error);
+
       res.status(500).json({
         message:
           error.message
@@ -51,6 +53,7 @@ const getProjects =
 
       let projects = [];
 
+
       // PROJECT LEAD
       if (
         req.user.role ===
@@ -63,6 +66,10 @@ const getProjects =
             createdBy:
               req.user.id
 
+          })
+
+          .sort({
+            createdAt: -1
           });
 
       }
@@ -83,10 +90,15 @@ const getProjects =
           });
 
         const projectIds =
-          tasks.map(
-            (task) =>
-              task.projectId
-          );
+          [
+            ...new Set(
+              tasks.map(
+                (task) =>
+                  task.projectId
+                    ?.toString()
+              )
+            )
+          ];
 
         projects =
           await Project.find({
@@ -96,6 +108,10 @@ const getProjects =
                 projectIds
             }
 
+          })
+
+          .sort({
+            createdAt: -1
           });
 
       }
@@ -116,10 +132,15 @@ const getProjects =
           });
 
         const projectIds =
-          tasks.map(
-            (task) =>
-              task.projectId
-          );
+          [
+            ...new Set(
+              tasks.map(
+                (task) =>
+                  task.projectId
+                    ?.toString()
+              )
+            )
+          ];
 
         projects =
           await Project.find({
@@ -129,6 +150,10 @@ const getProjects =
                 projectIds
             }
 
+          })
+
+          .sort({
+            createdAt: -1
           });
 
       }
