@@ -16,6 +16,11 @@ function Dashboard() {
 
   const currentRole = decoded.role;
 
+  const user =
+    JSON.parse(
+      localStorage.getItem("user")
+    );
+
 
   const [projects, setProjects] =
     useState([]);
@@ -185,6 +190,8 @@ function Dashboard() {
 
     localStorage.removeItem("token");
 
+    localStorage.removeItem("user");
+
     navigate("/");
 
   };
@@ -269,13 +276,88 @@ function Dashboard() {
           style={{
             color: "#38bdf8",
 
-            marginBottom: "40px"
+            marginBottom: "25px"
           }}
         >
 
           Ethara.AI
 
         </h1>
+
+
+        {/* USER DETAILS */}
+        <div
+          style={{
+            background:
+              darkMode
+              ? "#111827"
+              : "#cbd5e1",
+
+            padding: "18px",
+
+            borderRadius: "16px",
+
+            marginBottom: "30px"
+          }}
+        >
+
+          <h3
+            style={{
+              color: "#38bdf8",
+
+              marginBottom: "12px"
+            }}
+          >
+
+            User Details
+
+          </h3>
+
+          <p
+            style={{
+              marginBottom: "8px"
+            }}
+          >
+
+            <strong>Name:</strong>
+            {" "}
+            {user?.name}
+
+          </p>
+
+          <p
+            style={{
+              marginBottom: "8px"
+            }}
+          >
+
+            <strong>Email:</strong>
+            {" "}
+            {user?.email}
+
+          </p>
+
+          <p>
+
+            <strong>Role:</strong>
+            {" "}
+
+            <span
+              style={{
+                textTransform:
+                  "capitalize",
+
+                color: "#38bdf8"
+              }}
+            >
+
+              {user?.role}
+
+            </span>
+
+          </p>
+
+        </div>
 
 
         {/* NAV */}
