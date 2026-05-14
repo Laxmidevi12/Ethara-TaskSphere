@@ -16,10 +16,18 @@ function Dashboard() {
 
   const currentRole = decoded.role;
 
-  const user =
-    JSON.parse(
-      localStorage.getItem("user")
-    );
+  const user = {
+
+  name:
+    decoded.name || "User",
+
+  email:
+    decoded.email || "No Email",
+
+  role:
+    decoded.role
+
+};
 
 
   const [projects, setProjects] =
