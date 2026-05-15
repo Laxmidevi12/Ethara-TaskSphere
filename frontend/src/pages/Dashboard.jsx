@@ -152,6 +152,16 @@ function Dashboard() {
 
     e.preventDefault();
 
+    if (!attendance?.active) {
+
+      alert(
+        "Please Punch In First"
+      );
+
+      return;
+
+    }
+
     try {
 
       await API.post(
@@ -558,7 +568,7 @@ function Dashboard() {
 
           <p
             style={{
-              marginBottom: "20px",
+              marginBottom: "12px",
 
               color: subText
             }}
@@ -571,6 +581,33 @@ function Dashboard() {
             }
 
           </p>
+
+          {
+            attendance?.punchInTime && (
+
+              <p
+                style={{
+                  marginBottom: "20px",
+
+                  color: "#38bdf8",
+
+                  fontWeight: "bold"
+                }}
+              >
+
+                Punch In Time:
+                {" "}
+
+                {
+                  new Date(
+                    attendance.punchInTime
+                  ).toLocaleTimeString()
+                }
+
+              </p>
+
+            )
+          }
 
           {
             attendance?.active ? (
@@ -668,9 +705,33 @@ function Dashboard() {
                 />
 
 
-                <button style={blueBtn}>
+                <button
 
-                  Create Project
+                  disabled={
+                    !attendance?.active
+                  }
+
+                  style={{
+
+                    ...blueBtn,
+
+                    opacity:
+                      attendance?.active
+                      ? 1
+                      : 0.5,
+
+                    cursor:
+                      attendance?.active
+                      ? "pointer"
+                      : "not-allowed"
+                  }}
+                >
+
+                  {
+                    attendance?.active
+                    ? "Create Project"
+                    : "Punch In To Create"
+                  }
 
                 </button>
 
