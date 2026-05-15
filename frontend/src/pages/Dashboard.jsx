@@ -1,13 +1,3 @@
-
-
-
-
-
-
-If working properly, it should show:
-
-yes backend is showing TskSphere API Running but frontend is showing wrong
-
 const User = require("../models/User");
 
 const bcrypt = require("bcryptjs");
