@@ -1,19 +1,46 @@
-const express = require("express");
+const express =
+  require("express");
 
-const router = express.Router();
+const router =
+  express.Router();
 
 const {
   punchIn,
   punchOut,
-  getAttendance
-} = require("../controllers/attendanceController");
+  getAttendanceStatus
+} = require(
+  "../controllers/attendanceController"
+);
 
-const { protect } = require("../middleware/authMiddleware");
+const {
+  protect
+} = require(
+  "../middleware/authMiddleware"
+);
 
-router.post("/punchin", protect, punchIn);
 
-router.post("/punchout", protect, punchOut);
+// PUNCH IN
+router.post(
+  "/punchin",
+  protect,
+  punchIn
+);
 
-router.get("/status", protect, getAttendance);
 
-module.exports = router;
+// PUNCH OUT
+router.post(
+  "/punchout",
+  protect,
+  punchOut
+);
+
+
+// STATUS
+router.get(
+  "/status",
+  protect,
+  getAttendanceStatus
+);
+
+module.exports =
+  router;
