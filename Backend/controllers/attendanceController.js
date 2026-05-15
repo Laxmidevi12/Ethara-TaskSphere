@@ -1,79 +1,165 @@
-const Attendance = require("../models/Attendance");
+const Attendance =
+  require("../models/Attendance");
 
 
 // PUNCH IN
-const punchIn = async (req, res) => {
+const punchIn =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const attendance = await Attendance.create({
-      user: req.user.id,
-      punchIn: new Date(),
-      active: true
-    });
+      const existing =
+        await Attendance.findOne({
 
-    res.status(201).json(attendance);
+          user:
+            req.user.id,
 
-  } catch (error) {
+          punchOutTime:
+            null
 
-    res.status(500).json({
-      message: error.message
+        });
+
+      if (existing) {
+
+        return res.status(400)
+        .json({
+          message:
+            "Already punched in"
+        });
+
+      }
+
+      const attendance =
+        await Attendance.create({
+
+          user:
+            req.user.id,
+
+          punchInTime:
+            new Date()
+
+        });
+
+      res.status(201).json(
+        attendance
+      );
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          error.message
       });
 
-  }
+    }
+
 };
 
 
 // PUNCH OUT
-const punchOut = async (req, res) => {
+const punchOut =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const attendance = await Attendance.findOne({
-      user: req.user.id,
-      active: true
-    });
+      const attendance =
+        await Attendance.findOne({
 
-    attendance.punchOut = new Date();
+          user:
+            req.user.id,
 
-    attendance.active = false;
+          punchOutTime:
+            null
 
-    await attendance.save();
-    res.status(200).json(attendance);
+        });
 
-  } catch (error) {
+      if (!attendance) {
 
-    res.status(500).json({
-      message: error.message
-    });
+        return res.status(404)
+        .json({
+          message:
+            "No active session"
+        });
 
-  }
+      }
+
+      attendance.punchOutTime =
+        new Date();
+
+      await attendance.save();
+
+      res.status(200).json(
+        attendance
+      );
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          error.message
+      });
+
+    }
+
 };
 
 
-// GET STATUS
-const getAttendance = async (req, res) => {
+// STATUS
+const getAttendanceStatus =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const attendance = await Attendance.findOne({
-      user: req.user.id,
-      active: true
+      const attendance =
+        await Attendance.findOne({
+
+          user:
+            req.user.id
+
+        })
+
+        .sort({
+          createdAt: -1
+        });
+
+      if (!attendance) {
+
+        return res.json({
+
+          active: false
+
+        });
+
+      }
+
+      res.status(200).json({
+
+        active:
+          !attendance.punchOutTime,
+
+        punchInTime:
+          attendance.punchInTime,
+
+        punchOutTime:
+          attendance.punchOutTime
+
       });
 
-    res.status(200).json(attendance);
+    } catch (error) {
 
-  } catch (error) {
+      res.status(500).json({
+        message:
+          error.message
+      });
 
-    res.status(500).json({
-      message: error.message
-    });
+    }
 
-  }
 };
 
 module.exports = {
+
   punchIn,
   punchOut,
-  getAttendance
+  getAttendanceStatus
+
 };
