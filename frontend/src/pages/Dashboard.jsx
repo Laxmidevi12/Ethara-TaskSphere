@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
-
 import { jwtDecode } from "jwt-decode";
-
 import API from "../api";
 
 function Dashboard() {
@@ -16,7 +13,6 @@ function Dashboard() {
 
   const currentRole = decoded.role;
 
-
   const [projects, setProjects] =
     useState([]);
 
@@ -25,7 +21,6 @@ function Dashboard() {
 
   const [darkMode, setDarkMode] =
     useState(true);
-
 
   const [formData, setFormData] =
     useState({
@@ -43,7 +38,8 @@ function Dashboard() {
         "/projects",
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization:
+              `Bearer ${token}`
           }
         }
       );
@@ -59,27 +55,29 @@ function Dashboard() {
   };
 
 
-  // ATTENDANCE
-  const getAttendanceStatus = async () => {
+  // ATTENDANCE STATUS
+  const getAttendanceStatus =
+    async () => {
 
-    try {
+      try {
 
-      const res = await API.get(
-        "/attendance/status",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
+        const res = await API.get(
+          "/attendance/status",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
           }
-        }
-      );
+        );
 
-      setAttendance(res.data);
+        setAttendance(res.data);
 
-    } catch (error) {
+      } catch (error) {
 
-      console.log(error);
+        console.log(error);
 
-    }
+      }
 
   };
 
@@ -94,7 +92,8 @@ function Dashboard() {
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization:
+              `Bearer ${token}`
           }
         }
       );
@@ -120,12 +119,13 @@ function Dashboard() {
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization:
+              `Bearer ${token}`
           }
         }
       );
 
-      setAttendance(null);
+      getAttendanceStatus();
 
     } catch (error) {
 
@@ -140,52 +140,60 @@ function Dashboard() {
   const handleChange = (e) => {
 
     setFormData({
+
       ...formData,
-      [e.target.name]: e.target.value
+
+      [e.target.name]:
+        e.target.value
+
     });
 
   };
 
 
   // CREATE PROJECT
-  const createProject = async (e) => {
+  const createProject =
+    async (e) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    if (!attendance?.active) {
+      if (!attendance?.active) {
 
-      alert(
-        "Please Punch In First"
-      );
+        alert(
+          "Please Punch In First"
+        );
 
-      return;
+        return;
 
-    }
+      }
 
-    try {
+      try {
 
-      await API.post(
-        "/projects",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
+        await API.post(
+          "/projects",
+          formData,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
           }
-        }
-      );
+        );
 
-      fetchProjects();
+        fetchProjects();
 
-      setFormData({
-        title: "",
-        description: ""
-      });
+        setFormData({
 
-    } catch (error) {
+          title: "",
+          description: ""
 
-      console.log(error);
+        });
 
-    }
+      } catch (error) {
+
+        console.log(error);
+
+      }
 
   };
 
@@ -193,9 +201,13 @@ function Dashboard() {
   // LOGOUT
   const logout = () => {
 
-    localStorage.removeItem("token");
+    localStorage.removeItem(
+      "token"
+    );
 
-    localStorage.removeItem("user");
+    localStorage.removeItem(
+      "user"
+    );
 
     navigate("/");
 
@@ -234,44 +246,28 @@ function Dashboard() {
     <div
       style={{
         display: "flex",
-
         minHeight: "100vh",
-
         background: bg,
-
         color: text,
-
-        fontFamily: "Arial",
-
-        transition: "0.3s"
+        fontFamily: "Arial"
       }}
     >
-
 
       {/* SIDEBAR */}
       <div
         style={{
           width: "260px",
-
           background:
             darkMode
             ? "#0f172a"
             : "#e2e8f0",
-
-          padding: "30px",
-
-          borderRight:
-            darkMode
-            ? "1px solid rgba(255,255,255,0.05)"
-            : "1px solid rgba(0,0,0,0.05)"
+          padding: "30px"
         }}
       >
 
         <img
           src="/logo.png"
-
           width="120"
-
           style={{
             marginBottom: "20px"
           }}
@@ -280,7 +276,6 @@ function Dashboard() {
         <h1
           style={{
             color: "#38bdf8",
-
             marginBottom: "40px"
           }}
         >
@@ -305,11 +300,8 @@ function Dashboard() {
 
               style={{
                 padding: "14px",
-
                 marginBottom: "12px",
-
                 borderRadius: "12px",
-
                 cursor: "pointer",
 
                 background:
@@ -335,15 +327,10 @@ function Dashboard() {
 
           style={{
             marginTop: "40px",
-
             width: "100%",
-
             padding: "14px",
-
             borderRadius: "12px",
-
             border: "none",
-
             cursor: "pointer",
 
             background:
@@ -370,15 +357,10 @@ function Dashboard() {
 
           style={{
             marginTop: "15px",
-
             width: "100%",
-
             padding: "14px",
-
             borderRadius: "12px",
-
             border: "none",
-
             cursor: "pointer",
 
             background:
@@ -399,7 +381,6 @@ function Dashboard() {
       <div
         style={{
           flex: 1,
-
           padding: "35px"
         }}
       >
@@ -414,7 +395,6 @@ function Dashboard() {
           <h1
             style={{
               fontSize: "42px",
-
               marginBottom: "10px"
             }}
           >
@@ -426,7 +406,6 @@ function Dashboard() {
           <p
             style={{
               color: subText,
-
               fontSize: "18px"
             }}
           >
@@ -437,8 +416,8 @@ function Dashboard() {
             <span
               style={{
                 color: "#38bdf8",
-
-                textTransform: "capitalize"
+                textTransform:
+                  "capitalize"
               }}
             >
 
@@ -465,18 +444,11 @@ function Dashboard() {
           }}
         >
 
-          {/* CARD */}
           <div
             style={{
               background: card,
-
               padding: "30px",
-
-              borderRadius: "22px",
-
-              transition: "0.3s",
-
-              cursor: "pointer"
+              borderRadius: "22px"
             }}
           >
 
@@ -493,7 +465,6 @@ function Dashboard() {
             <h1
               style={{
                 fontSize: "55px",
-
                 color: "#38bdf8"
               }}
             >
@@ -505,13 +476,10 @@ function Dashboard() {
           </div>
 
 
-          {/* ROLE */}
           <div
             style={{
               background: card,
-
               padding: "30px",
-
               borderRadius: "22px"
             }}
           >
@@ -528,7 +496,8 @@ function Dashboard() {
 
             <h1
               style={{
-                textTransform: "capitalize",
+                textTransform:
+                  "capitalize",
 
                 color: "#8b5cf6"
               }}
@@ -547,11 +516,8 @@ function Dashboard() {
         <div
           style={{
             background: card,
-
             padding: "30px",
-
             borderRadius: "22px",
-
             marginBottom: "35px"
           }}
         >
@@ -566,10 +532,10 @@ function Dashboard() {
 
           </h2>
 
+
           <p
             style={{
               marginBottom: "12px",
-
               color: subText
             }}
           >
@@ -582,15 +548,14 @@ function Dashboard() {
 
           </p>
 
+
           {
             attendance?.punchInTime && (
 
               <p
                 style={{
-                  marginBottom: "20px",
-
+                  marginBottom: "10px",
                   color: "#38bdf8",
-
                   fontWeight: "bold"
                 }}
               >
@@ -609,12 +574,38 @@ function Dashboard() {
             )
           }
 
+
+          {
+            attendance?.punchOutTime && (
+
+              <p
+                style={{
+                  marginBottom: "20px",
+                  color: "#ef4444",
+                  fontWeight: "bold"
+                }}
+              >
+
+                Punch Out Time:
+                {" "}
+
+                {
+                  new Date(
+                    attendance.punchOutTime
+                  ).toLocaleTimeString()
+                }
+
+              </p>
+
+            )
+          }
+
+
           {
             attendance?.active ? (
 
               <button
                 onClick={punchOut}
-
                 style={redBtn}
               >
 
@@ -626,7 +617,6 @@ function Dashboard() {
 
               <button
                 onClick={punchIn}
-
                 style={greenBtn}
               >
 
@@ -640,7 +630,7 @@ function Dashboard() {
         </div>
 
 
-        {/* PROJECT LEAD */}
+        {/* CREATE PROJECT */}
         {
           currentRole ===
           "projectlead" && (
@@ -648,11 +638,8 @@ function Dashboard() {
             <div
               style={{
                 background: card,
-
                 padding: "30px",
-
                 borderRadius: "22px",
-
                 marginBottom: "35px"
               }}
             >
@@ -667,7 +654,11 @@ function Dashboard() {
 
               </h2>
 
-              <form onSubmit={createProject}>
+              <form
+                onSubmit={
+                  createProject
+                }
+              >
 
                 <input
                   type="text"
@@ -676,9 +667,13 @@ function Dashboard() {
 
                   placeholder="Project Title"
 
-                  value={formData.title}
+                  value={
+                    formData.title
+                  }
 
-                  onChange={handleChange}
+                  onChange={
+                    handleChange
+                  }
 
                   style={inputStyle(
                     darkMode
@@ -697,7 +692,9 @@ function Dashboard() {
                     formData.description
                   }
 
-                  onChange={handleChange}
+                  onChange={
+                    handleChange
+                  }
 
                   style={inputStyle(
                     darkMode
@@ -776,9 +773,7 @@ function Dashboard() {
 
                   style={{
                     background: card,
-
                     padding: "25px",
-
                     borderRadius: "22px"
                   }}
                 >
@@ -796,7 +791,6 @@ function Dashboard() {
                   <p
                     style={{
                       color: subText,
-
                       marginBottom: "20px"
                     }}
                   >
@@ -894,28 +888,29 @@ const greenBtn = {
 };
 
 
-// INPUT
-const inputStyle = (darkMode) => ({
+// INPUT STYLE
+const inputStyle =
+  (darkMode) => ({
 
-  width: "100%",
+    width: "100%",
 
-  padding: "15px",
+    padding: "15px",
 
-  marginBottom: "18px",
+    marginBottom: "18px",
 
-  borderRadius: "12px",
+    borderRadius: "12px",
 
-  border: "none",
+    border: "none",
 
-  background:
-    darkMode
-    ? "#1e293b"
-    : "#e2e8f0",
+    background:
+      darkMode
+      ? "#1e293b"
+      : "#e2e8f0",
 
-  color:
-    darkMode
-    ? "white"
-    : "#0f172a"
+    color:
+      darkMode
+      ? "white"
+      : "#0f172a"
 });
 
 export default Dashboard;
