@@ -1,30 +1,44 @@
-const mongoose = require("mongoose");
+const mongoose =
+  require("mongoose");
 
-const attendanceSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+const attendanceSchema =
+  new mongoose.Schema(
+
+    {
+
+      user: {
+
+        type:
+          mongoose.Schema.Types.ObjectId,
+
+        ref: "User"
+
+      },
+
+      punchInTime: {
+
+        type: Date
+
+      },
+
+      punchOutTime: {
+
+        type: Date,
+
+        default: null
+
+      }
+
     },
 
-    punchIn: {
-      type: Date
-    },
-
-    punchOut: {
-      type: Date
-    },
-      active: {
-      type: Boolean,
-      default: false
+    {
+      timestamps: true
     }
-  },
-  {
-    timestamps: true
-  }
-);
 
-module.exports = mongoose.model(
-  "Attendance",
-  attendanceSchema
-);
+  );
+
+module.exports =
+  mongoose.model(
+    "Attendance",
+    attendanceSchema
+  );
