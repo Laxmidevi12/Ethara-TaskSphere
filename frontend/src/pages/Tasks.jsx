@@ -36,6 +36,9 @@ function Tasks() {
   const [users, setUsers] =
     useState([]);
 
+  const [attendance, setAttendance] =
+    useState(null);
+
 
   const [formData, setFormData] =
     useState({
@@ -104,6 +107,36 @@ function Tasks() {
   };
 
 
+  // GET ATTENDANCE STATUS
+  const getAttendanceStatus =
+    async () => {
+
+      try {
+
+        const res =
+          await API.get(
+            "/attendance/status",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+        setAttendance(
+          res.data
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+  };
+
+
   // HANDLE INPUT
   const handleChange = (e) => {
 
@@ -125,6 +158,16 @@ function Tasks() {
   ) => {
 
     e.preventDefault();
+
+    if (!attendance?.active) {
+
+      alert(
+        "Please Punch In First"
+      );
+
+      return;
+
+    }
 
     try {
 
@@ -220,6 +263,8 @@ function Tasks() {
       fetchTasks();
 
       fetchUsers();
+
+      getAttendanceStatus();
 
     }
 
@@ -445,7 +490,12 @@ function Tasks() {
               <button
                 type="submit"
 
+                disabled={
+                  !attendance?.active
+                }
+
                 style={{
+
                   padding:
                     "14px 25px",
 
@@ -462,11 +512,22 @@ function Tasks() {
                     "10px",
 
                   cursor:
-                    "pointer"
+                    attendance?.active
+                    ? "pointer"
+                    : "not-allowed",
+
+                  opacity:
+                    attendance?.active
+                    ? 1
+                    : 0.5
                 }}
               >
 
-                Assign Task
+                {
+                  attendance?.active
+                  ? "Assign Task"
+                  : "Punch In To Assign"
+                }
 
               </button>
 
@@ -614,7 +675,7 @@ function Tasks() {
                         padding:
                           "10px",
 
-                          background:
+                        background:
                           "#2563eb",
 
                         color:
